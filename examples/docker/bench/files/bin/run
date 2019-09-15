@@ -1,0 +1,14 @@
+#!/bin/sh
+echo "Starting GET"
+/bin/get &
+getPid=$!
+
+echo "Starting PURGE"
+/bin/purge &
+purgePid=$!
+
+echo "Running"
+while sleep 60; do
+  kill -0 $getPid || exit 1
+  kill -0 $purgePid || exit 1
+done

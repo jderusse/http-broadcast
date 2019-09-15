@@ -1,0 +1,5 @@
+#!/bin/sh
+while true; do
+    curl -si http://varnish:6081/ -H "Host: www.example.com" | grep "Age"
+    sleep 1
+done

@@ -1,0 +1,44 @@
+name: GoReleaser
+on:
+  push:
+    tags:
+    - 'v*'
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Go
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.12
+    - name: Check out code
+      uses: actions/checkout@v1
+    - name: Install dependency
+      run: |
+        go mod download
+
+    - name: Run Unit tests.
+      run: |
+        go test -short -covermode=atomic ./...
+
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    needs: [ test ]
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v1
+    - name: Login to dockerhub
+      uses: actions/docker/login@master
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+    - name: goreleaser
+      uses: docker://goreleaser/goreleaser
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        args: release --rm-dist
+      if: success()

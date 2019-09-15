@@ -1,0 +1,5 @@
+#!/bin/sh
+while true; do
+    curl -s -X PURGE http://varnish:6083 -H "Host: www.example.com"
+    sleep 10
+done
