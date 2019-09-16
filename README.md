@@ -7,6 +7,8 @@ registry.
 This project has been initialized in order to invalidate a cluster of docker
 varnish servers.
 
+![Schema](examples/schema.svg)
+
 ## Description
 
 Each HTTP request sent to a broadcaster is pushed into a mercure HUB,
