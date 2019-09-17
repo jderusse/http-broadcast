@@ -7,6 +7,7 @@ automatically broadcast the PURGE requests to all the varnish containers.
 
 - a varnish image containing a vanishd server and a `http-broadcast` instance
 - a dummy `nginx` instance
+- a mercure hub
 - a `bench` container that send a `GET` request every seconds, and send a `PURGE` request every 10 seconds
 
 ## How to demo
