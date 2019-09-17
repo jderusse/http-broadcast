@@ -7,28 +7,13 @@ registry.
 This project has been initialized in order to invalidate a cluster of docker
 varnish servers.
 
-![Schema](examples/schema.svg)
-
 ## Description
 
-Each HTTP request sent to a broadcaster is pushed into a mercure HUB,
-then dispatched to all other broadcaster who'll replay the same request.
+Each HTTP request sent to a listening http-broadcast is pushed into a mercure
+HUB, then dispatched to all publishing http-broadcast who'll replay the same
+request.
 
-```
-                                           +-----------+   +--------+
-                              /-------\    |           |   |        |
-                             +         +   |   HTTP    +---> Server |
-             +-----------+   |\-------/|   | Broadcast |   |        |
-+--------+   |           |   |         <---+           |   +--------+
-|        |   |   HTTP    |   | Mercure |   +-----------+
-| client +---> Broadcast +--->   HUB   |
-|        |   |           |   |         |   +-----------+
-+--------+   +-----------+   |         <---+           |   +--------+
-                              \-------/    |   HTTP    |   |        |
-                                           | Broadcast +---> Server |
-                                           |           |   |        |
-                                           +-----------+   +--------+
-```
+![Schema](examples/schema.svg)
 
 ## Benefits over other solution
 
@@ -171,6 +156,3 @@ sub vcl_recv {
 * `SERVER_TLS_KEY_FILE`: a key file (to use a custom certificate)
 * `SERVER_TRUSTED_IPS`: list of trusted ips which lead to remote client address replacement in [ProxyProtocol](https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt).
 * `SERVER_WRITE_TIMEOUT`: maximum duration for reading the entire request, including the body, set to `0s` to disable (default), example: `2m`.
-
-## TODO
-- example K8s

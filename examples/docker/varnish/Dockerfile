@@ -1,8 +1,6 @@
 FROM alpine
 
 COPY --from=jderusse/http-broadcast:latest /http-broadcast /bin/http-broadcast
-ENV SERVER_ADDR=:6083
-ENV AGENT_ENDPOINT=http://127.0.0.1:6082
 
 # install your main service
 RUN apk add --no-cache \
