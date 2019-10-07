@@ -3,7 +3,7 @@
 :+1::tada: First off, thanks for taking the time to contribute! :tada::+1:
 
 The following is a set of guidelines for contributing to HTTP Broadcast project.
-These are mostly guidelines, not rules. Use your best judgment, and feel free to 
+These are mostly guidelines, not rules. Use your best judgment, and feel free to
 propose changes to this document in a pull request.
 
 ## Install and run the project locally
@@ -23,8 +23,8 @@ To run the test suite:
 
 To lint your code:
 
-    $ # go get -u golang.org/x/lint/golint
-    $ golint -min_confidence=0.3 -set_exit_status ./...
+    $ # go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
+    $ golangci-lint run --fix  ./...
 
 ## Pull Request Process
 

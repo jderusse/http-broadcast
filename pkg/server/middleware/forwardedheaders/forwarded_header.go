@@ -3,11 +3,12 @@ package forwardedheaders
 // Cloned from https://github.com/containous/traefik/blob/master/pkg/middlewares/forwardedheaders/forwarded_header.go
 
 import (
-	"github.com/jderusse/http-broadcast/pkg/ip"
 	"net"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/jderusse/http-broadcast/pkg/ip"
 )
 
 const (
@@ -25,17 +26,19 @@ const (
 	upgrade                     = "Upgrade"
 )
 
-var xHeaders = []string{
-	xForwardedProto,
-	xForwardedFor,
-	xForwardedHost,
-	xForwardedPort,
-	xForwardedServer,
-	xForwardedURI,
-	xForwardedMethod,
-	xForwardedTLSClientCert,
-	xForwardedTLSClientCertInfo,
-	xRealIP,
+func xHeaders() []string {
+	return []string{
+		xForwardedProto,
+		xForwardedFor,
+		xForwardedHost,
+		xForwardedPort,
+		xForwardedServer,
+		xForwardedURI,
+		xForwardedMethod,
+		xForwardedTLSClientCert,
+		xForwardedTLSClientCertInfo,
+		xRealIP,
+	}
 }
 
 // XForwarded is an HTTP handler wrapper that sets the X-Forwarded headers, and other relevant headers for a
@@ -165,7 +168,7 @@ func (x *XForwarded) rewrite(outreq *http.Request) {
 // ServeHTTP implements http.Handler
 func (x *XForwarded) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if !x.insecure && !x.isTrustedIP(r.RemoteAddr) {
-		for _, h := range xHeaders {
+		for _, h := range xHeaders() {
 			r.Header.Del(h)
 		}
 	}

@@ -104,11 +104,8 @@ func (a *Agent) serve() error {
 			if event != nil {
 				go a.replay(event.Id(), []byte(event.Data()))
 			}
-			break
 		}
 	}
-
-	return nil
 }
 
 func (a *Agent) hubURL() string {

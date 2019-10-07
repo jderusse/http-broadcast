@@ -12,19 +12,16 @@ import (
 	"github.com/jderusse/http-broadcast/pkg/broadcaster"
 )
 
-func init() {
+func initLogger() {
 	format := os.Getenv("LOG_FORMAT")
 	switch strings.ToLower(format) {
 	case "json":
 		log.SetFormatter(&log.JSONFormatter{})
-		break
 	case "":
 	case "text":
 		log.SetFormatter(&log.TextFormatter{})
-		break
 	case "fluentd":
 		log.SetFormatter(fluentd.NewFormatter())
-		break
 	default:
 		log.Error(fmt.Sprintf(`Unexpected log format "%s"`, format))
 	}
@@ -40,6 +37,7 @@ func init() {
 }
 
 func main() {
+	initLogger()
 	broadcaster, err := broadcaster.NewBroadcasterFromEnv()
 	if err != nil {
 		log.Fatalln(err)

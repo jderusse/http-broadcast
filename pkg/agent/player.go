@@ -31,7 +31,7 @@ func (a *Agent) replay(requestID string, data []byte) {
 	targetURL.Path = fmt.Sprintf("%s/%s", strings.TrimRight(a.options.Agent.Endpoint.Path, "/"), strings.TrimLeft(request.Path, "/"))
 
 	req, _ := http.NewRequest(request.Method, targetURL.String(), bytes.NewBuffer(request.Body))
-	req.Header = http.Header(request.Header)
+	req.Header = request.Header
 	req.Host = request.Host
 
 	retry := backoff.NewExponentialBackOff()

@@ -5,7 +5,7 @@
 In order to Published and Subscribe to the mercure's hub you need a valid JWT token.
 See `HUB_PUBLISH_TOKEN`, `HUB_SUBSCRIBE_TOKEN` and `HUB_TOKEN` from [configuration documentation](configuration.md)
 
-This token should be signed with the `JWT_KEY` used in mercure's HUB ([example](https://jwt.io/#debugger-io?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InB1Ymxpc2giOltdfX0.473isprbLWLjXmAaVZj6FIVkCdjn37SQpGjzWws-xa0)).
+This token should be signed with the `JWT_KEY` used in mercure's HUB ([example](https://jwt.io/#debugger-io?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InB1Ymxpc2giOltdLCJzdWJzY3JpYmUiOltdfX0.Pcdsjf9mQKhEen8QD43UlZnat2E3-glbYnjF1yXkoCM)).
 
 ## Embedded in your own Docker image
 

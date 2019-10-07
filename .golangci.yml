@@ -1,0 +1,10 @@
+run:
+  tests: false
+
+linters:
+  # inverted configuration with `enable-all` and `disable` is not scalable during updates of golangci-lint
+  enable-all: true
+  disable:
+    - errcheck
+    - funlen
+    - lll
