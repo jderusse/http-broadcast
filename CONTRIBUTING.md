@@ -19,7 +19,7 @@ Run the application:
 
 To run the test suite:
 
-    $ go test ./...
+    $ go test ./... -race
 
 To lint your code:
 

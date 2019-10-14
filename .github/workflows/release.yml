@@ -20,7 +20,7 @@ jobs:
 
     - name: Run Unit tests.
       run: |
-        go test -short -covermode=atomic ./...
+        go test -race -short -covermode=atomic ./...
 
   release:
     name: Release

@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -23,9 +24,9 @@ func TestServe(t *testing.T) {
 	server := eventsource.NewServer()
 	hubServer := httptest.NewServer(server.Handler("foo"))
 
-	var targetRequest *http.Request
+	var targetRequest atomic.Value
 	targetServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		targetRequest = r
+		targetRequest.Store(r)
 	}))
 	// The server has to be closed before the hubServer is closed.
 	// Otherwise the hubServer has still an open connection and it can not close.
@@ -52,16 +53,18 @@ func TestServe(t *testing.T) {
 	require.Nil(t, err)
 	server.Publish([]string{"foo"}, event)
 	time.Sleep(100 * time.Millisecond)
-	assert.NotNil(t, targetRequest)
+
+	v, _ := targetRequest.Load().(*http.Request)
+	assert.NotNil(t, v)
 }
 
 func TestShutdown(t *testing.T) {
 	server := eventsource.NewServer()
 	hubServer := httptest.NewServer(server.Handler("foo"))
 
-	var targetRequest *http.Request
+	var targetRequest atomic.Value
 	targetServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		targetRequest = r
+		targetRequest.Store(r)
 	}))
 	// The server has to be closed before the hubServer is closed.
 	// Otherwise the hubServer has still an open connection and it can not close.
@@ -88,7 +91,9 @@ func TestShutdown(t *testing.T) {
 	require.Nil(t, err)
 	server.Publish([]string{"foo"}, event)
 	time.Sleep(100 * time.Millisecond)
-	assert.Nil(t, targetRequest)
+
+	v, _ := targetRequest.Load().(*http.Request)
+	assert.Nil(t, v)
 }
 
 func parseSafeURL(urlString string) *url.URL {
