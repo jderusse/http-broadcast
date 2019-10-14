@@ -52,10 +52,12 @@ type HubOptions struct {
 	SubscribeToken string
 	Timeout        time.Duration
 	Topic          string
+	Target         string
 }
 
 // NewOptionsFromEnv creates a new option instance from environment
 // It returns an error if mandatory env env vars are missing
+//nolint:gocognit
 func NewOptionsFromEnv() (*Options, error) {
 	agentRetryDelay, err := time.ParseDuration(getEnv("AGENT_RETRY_DELAY", "60s"))
 	if err != nil {
@@ -102,6 +104,17 @@ func NewOptionsFromEnv() (*Options, error) {
 		hubTopic = "http-broadcast"
 	}
 
+	hubTarget := os.Getenv("HUB_TARGET")
+	if hubEndpoint != nil {
+		if hubTarget == "" {
+			hubTarget = hubEndpoint.Query().Get("target")
+		}
+
+		q := hubEndpoint.Query()
+		q.Del("target")
+		hubEndpoint.RawQuery = q.Encode()
+	}
+
 	options := &Options{
 		Debug: getEnv("DEBUG", "0") == "1",
 		Agent: AgentOptions{
@@ -115,6 +128,7 @@ func NewOptionsFromEnv() (*Options, error) {
 			SubscribeToken: getEnv("HUB_SUBSCRIBE_TOKEN", os.Getenv("HUB_TOKEN")),
 			Timeout:        hubTimeout,
 			Topic:          hubTopic,
+			Target:         hubTarget,
 		},
 		Server: ServerOptions{
 			Addr:               os.Getenv("SERVER_ADDR"),
