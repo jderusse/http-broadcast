@@ -32,10 +32,11 @@ func (s *Server) handle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// building Hub Request
-	log.WithFields(log.Fields{"data": string(data), "topic": s.options.Hub.Topic, "hub": s.options.Hub.Endpoint}).Debug("Server: Pushing message to HUB")
+	log.WithFields(log.Fields{"data": string(data), "topic": s.options.Hub.Topic, "target": s.options.Hub.Target, "hub": s.options.Hub.Endpoint}).Debug("Server: Pushing message to HUB")
 
 	form := url.Values{}
 	form.Set("topic", s.options.Hub.Topic)
+	form.Set("target", s.options.Hub.Target)
 	form.Set("data", string(data))
 	formData := form.Encode()
 

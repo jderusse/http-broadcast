@@ -31,6 +31,7 @@ func TestHandle(t *testing.T) {
 		Hub: config.HubOptions{
 			Endpoint:   parseSafeURL(httpServer.URL),
 			Topic:      "my-topic",
+			Target:     "my-target",
 			GuardToken: "-",
 		},
 	})
@@ -56,6 +57,7 @@ func TestHandle(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, "my-topic", form.Get("topic"))
+	assert.Equal(t, "my-target", form.Get("target"))
 	assert.Equal(t, `{"Method":"POST","Host":"127.0.0.1:8002","Path":"/","Header":{"Accept-Encoding":["gzip"],"Content-Length":["5"],"Content-Type":["text/plain"],"User-Agent":["Go-http-client/1.1"],"X-Forwarded-Host":["127.0.0.1:8002"],"X-Forwarded-Port":["8002"],"X-Forwarded-Proto":["http"],"X-Forwarded-Server":["`+hostname+`"],"X-Httpbroadcast-Guard":["-"],"X-Real-Ip":["127.0.0.1"]},"Body":"SGVsbG8="}`, form.Get("data"))
 }
 
