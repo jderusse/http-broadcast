@@ -55,9 +55,11 @@ type XForwarded struct {
 // NewXForwarded creates a new XForwarded.
 func NewXForwarded(insecure bool, trustedIps []string, next http.Handler) (*XForwarded, error) {
 	var ipChecker *ip.Checker
+
 	if len(trustedIps) > 0 {
 		var err error
 		ipChecker, err = ip.NewChecker(trustedIps)
+
 		if err != nil {
 			return nil, err
 		}
@@ -81,6 +83,7 @@ func (x *XForwarded) isTrustedIP(ip string) bool {
 	if x.ipChecker == nil {
 		return false
 	}
+
 	return x.ipChecker.IsAuthorized(ip) == nil
 }
 
@@ -101,8 +104,10 @@ func isWebsocketRequest(req *http.Request) bool {
 				return true
 			}
 		}
+
 		return false
 	}
+
 	return containsHeader(connection, "upgrade") && containsHeader(upgrade, "websocket")
 }
 

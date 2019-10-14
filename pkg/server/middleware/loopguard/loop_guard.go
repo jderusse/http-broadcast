@@ -21,9 +21,11 @@ type LoopGuard struct {
 func (l *LoopGuard) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	tokens := []string{}
 	contains := false
+
 	for _, token := range strings.Split(r.Header.Get(guardHeader), ",") {
 		if token = strings.TrimSpace(token); token != "" {
 			tokens = append(tokens, token)
+
 			if token == l.token {
 				contains = true
 			}
@@ -39,9 +41,11 @@ func (l *LoopGuard) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+
 	if l.token != "" {
 		tokens = append(tokens, l.token)
 	}
+
 	r.Header.Set(guardHeader, strings.Join(tokens, ", "))
 	l.next.ServeHTTP(w, r)
 }

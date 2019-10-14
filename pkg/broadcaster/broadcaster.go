@@ -25,6 +25,7 @@ func (b *Broadcaster) Run() {
 
 	if b.agent != nil {
 		b.wg.Add(1)
+
 		go func() {
 			if err := b.agent.ListenAndServe(); err != nil {
 				if err != agent.ErrServerClosed {
@@ -35,8 +36,10 @@ func (b *Broadcaster) Run() {
 			b.wg.Done()
 		}()
 	}
+
 	if b.server != nil {
 		b.wg.Add(1)
+
 		go func() {
 			if err := b.server.ListenAndServe(); err != nil {
 				if err != server.ErrServerClosed {
@@ -59,6 +62,7 @@ func (b *Broadcaster) Stop() {
 	if b.agent != nil {
 		b.agent.Shutdown()
 	}
+
 	if b.server != nil {
 		b.server.Shutdown()
 	}
@@ -70,11 +74,13 @@ func (b *Broadcaster) handleShutdown() {
 			b.Stop()
 		})
 	}
+
 	if b.agent != nil {
 		b.agent.RegisterOnShutdown(func() {
 			b.Stop()
 		})
 	}
+
 	go func() {
 		sigint := make(chan os.Signal, 1)
 		signal.Notify(sigint, os.Interrupt)
@@ -98,11 +104,15 @@ func NewBroadcasterFromEnv() (*Broadcaster, error) {
 
 // NewBroadcaster allocates and returns a new Broadcaster.
 func NewBroadcaster(options *config.Options) *Broadcaster {
-	var a *agent.Agent
-	var s *server.Server
+	var (
+		a *agent.Agent
+		s *server.Server
+	)
+
 	if options.Server.Addr != "" {
 		s = server.NewServer(options)
 	}
+
 	if nil != options.Agent.Endpoint {
 		a = agent.NewAgent(options)
 	}
@@ -112,5 +122,6 @@ func NewBroadcaster(options *config.Options) *Broadcaster {
 		server: s,
 	}
 	b.handleShutdown()
+
 	return b
 }

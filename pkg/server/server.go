@@ -42,11 +42,14 @@ func (s *Server) ListenAndServe() error {
 	if s.shuttingDown() {
 		return ErrServerClosed
 	}
+
 	ln, err := s.listen()
 	if err != nil {
 		return err
 	}
+
 	defer ln.Close()
+
 	return s.serve(ln)
 }
 
@@ -68,6 +71,7 @@ func (s *Server) listen() (net.Listener, error) {
 	defer s.mu.Unlock()
 
 	log.Debug("server: starting")
+
 	s.httpServer = &http.Server{
 		Handler:      s.chainHandlers(),
 		ReadTimeout:  s.options.Server.ReadTimeout,
@@ -91,6 +95,7 @@ func (s *Server) serve(ln net.Listener) error {
 	if s.isTLS() {
 		return s.serveTLS(ln)
 	}
+
 	return s.servePlain(ln)
 }
 
@@ -102,6 +107,7 @@ func (s *Server) serveTLS(ln net.Listener) error {
 	if len(s.options.Server.TLS.AcmeHosts) > 0 {
 		s.startAcmeServer()
 	}
+
 	err := s.httpServer.ServeTLS(ln, s.options.Server.TLS.CertFile, s.options.Server.TLS.KeyFile)
 	if err == http.ErrServerClosed {
 		return ErrServerClosed
@@ -118,13 +124,16 @@ func (s *Server) startAcmeServer() {
 		Prompt:     autocert.AcceptTOS,
 		HostPolicy: autocert.HostWhitelist(s.options.Server.TLS.AcmeHosts...),
 	}
+
 	if s.options.Server.TLS.AcmeCertDir != "" {
 		certManager.Cache = autocert.DirCache(s.options.Server.TLS.AcmeCertDir)
 	}
+
 	s.httpServer.TLSConfig = certManager.TLSConfig()
 
 	// Mandatory for Let's Encrypt http-01 challenge
 	log.WithFields(log.Fields{"hosts": s.options.Server.TLS.AcmeHosts}).Debug("server: acme server starting")
+
 	s.acmeServer = &http.Server{
 		Handler: certManager.HTTPHandler(nil),
 	}
@@ -136,7 +145,9 @@ func (s *Server) startAcmeServer() {
 	if err != nil {
 		log.Error(errors.Wrap(err, "fail to start acme server"))
 	}
+
 	log.WithFields(log.Fields{"hosts": s.options.Server.TLS.AcmeHosts, "addr": s.options.Server.TLS.AcmeAddr}).Info("server: acme server listening")
+
 	go func() {
 		defer ln.Close()
 		s.acmeServer.Serve(ln)
@@ -162,6 +173,7 @@ func (s *Server) chainHandlers() http.Handler {
 
 	if len(s.options.Server.CorsAllowedOrigins) > 0 {
 		log.WithFields(log.Fields{"origin": s.options.Server.CorsAllowedOrigins}).Debug("server: configure handlers CORS")
+
 		h = handlers.CORS(
 			handlers.AllowCredentials(),
 			handlers.AllowedOrigins(s.options.Server.CorsAllowedOrigins),
@@ -198,17 +210,22 @@ func (s *Server) chainHandlers() http.Handler {
 func (s *Server) Shutdown() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+
 	if s.shuttingDown() {
 		return nil
 	}
+
 	log.Debug("server: stopping")
 	s.inShutdown.Store(true)
 
 	lnerr := s.closeHTTPServerLocked()
+
 	for _, f := range s.onShutdown {
 		go f()
 	}
+
 	log.Debug("server: stopped")
+
 	return lnerr
 }
 
@@ -216,6 +233,7 @@ func (s *Server) closeHTTPServerLocked() error {
 	if s.acmeServer != nil {
 		s.acmeServer.Shutdown(context.Background())
 	}
+
 	return s.httpServer.Shutdown(context.Background())
 }
 

@@ -38,7 +38,9 @@ func initLogger() {
 
 func main() {
 	initLogger()
+
 	broadcaster, err := broadcaster.NewBroadcasterFromEnv()
+
 	if err != nil {
 		log.Fatalln(err)
 	}

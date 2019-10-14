@@ -20,5 +20,6 @@ func (b *Bool) Store(value bool) {
 	} else {
 		i = 0
 	}
+
 	base.StoreInt32((*int32)(b), i)
 }

@@ -39,9 +39,11 @@ func (a *Agent) ListenAndServe() error {
 	if a.shuttingDown() {
 		return ErrServerClosed
 	}
+
 	if err := a.listen(); err != nil {
 		return err
 	}
+
 	return a.serve()
 }
 
@@ -62,9 +64,11 @@ func (a *Agent) listen() error {
 	log.Debug("agent: starting")
 
 	hubRequest, err := http.NewRequest("GET", a.hubURL(), nil)
+
 	if err != nil {
 		return err
 	}
+
 	if a.options.Hub.SubscribeToken != "" {
 		hubRequest.Header.Set("Authorization", fmt.Sprintf("Bearer %s", a.options.Hub.SubscribeToken))
 	}
@@ -73,6 +77,7 @@ func (a *Agent) listen() error {
 	retry.MaxInterval = 5 * time.Second
 	retry.MaxElapsedTime = 0
 	ctx, cancel := context.WithCancel(context.Background())
+
 	a.RegisterOnShutdown(func() { cancel() })
 
 	err = backoff.Retry(func() error {
@@ -81,11 +86,13 @@ func (a *Agent) listen() error {
 			a.mu.Lock()
 			a.stream = stream
 			a.mu.Unlock()
+
 			return nil
 		}
 
 		return err
 	}, backoff.WithContext(retry, ctx))
+
 	if err != nil {
 		return errors.Wrap(err, "fail to subscribe to stream")
 	}
@@ -129,19 +136,24 @@ func (a *Agent) hubURL() string {
 func (a *Agent) Shutdown() error {
 	a.mu.Lock()
 	defer a.mu.Unlock()
+
 	if a.shuttingDown() {
 		return nil
 	}
+
 	log.Debug("agent: stopping")
 
 	a.inShutdown.Store(true)
 
 	lnerr := a.closeStreamLocked()
 	a.closeDoneChanLocked()
+
 	for _, f := range a.onShutdown {
 		go f()
 	}
+
 	log.Debug("agent: stopped")
+
 	return lnerr
 }
 
@@ -160,6 +172,7 @@ func (a *Agent) closeDoneChanLocked() {
 func (a *Agent) getDoneChan() <-chan struct{} {
 	a.mu.Lock()
 	defer a.mu.Unlock()
+
 	return a.getDoneChanLocked()
 }
 
@@ -167,6 +180,7 @@ func (a *Agent) getDoneChanLocked() chan struct{} {
 	if a.doneChan == nil {
 		a.doneChan = make(chan struct{})
 	}
+
 	return a.doneChan
 }
 

@@ -81,6 +81,7 @@ func NewOptionsFromEnv() (*Options, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "AGENT_ENDPOINT")
 	}
+
 	hubEndpoint, err := parseURL(os.Getenv("HUB_ENDPOINT"))
 	if err != nil {
 		return nil, errors.Wrap(err, "HUB_ENDPOINT")
@@ -91,10 +92,12 @@ func NewOptionsFromEnv() (*Options, error) {
 		if hubTopic == "" {
 			hubTopic = hubEndpoint.Query().Get("topic")
 		}
+
 		q := hubEndpoint.Query()
 		q.Del("topic")
 		hubEndpoint.RawQuery = q.Encode()
 	}
+
 	if hubTopic == "" {
 		hubTopic = "http-broadcast"
 	}
@@ -134,18 +137,23 @@ func NewOptionsFromEnv() (*Options, error) {
 	if options.Hub.Endpoint == nil {
 		missingEnv = append(missingEnv, "HUB_ENDPOINT")
 	}
+
 	if len(options.Hub.Topic) == 0 {
 		missingEnv = append(missingEnv, "HUB_TOPIC")
 	}
+
 	if len(options.Server.Addr) == 0 && nil == options.Agent.Endpoint {
 		missingEnv = append(missingEnv, "SERVER_ADDR/AGENT_ENDPOINT")
 	}
+
 	if len(options.Server.Addr) != 0 && len(options.Hub.PublishToken) == 0 {
 		missingEnv = append(missingEnv, "HUB_PUBLISH_TOKEN/HUB_TOKEN")
 	}
+
 	if len(options.Server.TLS.CertFile) != 0 && len(options.Server.TLS.KeyFile) == 0 {
 		missingEnv = append(missingEnv, "SERVER_TLS_KEY_FILE")
 	}
+
 	if len(options.Server.TLS.KeyFile) != 0 && len(options.Server.TLS.CertFile) == 0 {
 		missingEnv = append(missingEnv, "SERVER_TLS_CERT_FILE")
 	}
@@ -162,6 +170,7 @@ func getEnv(k string, d string) string {
 	if v != "" {
 		return v
 	}
+
 	return d
 }
 
