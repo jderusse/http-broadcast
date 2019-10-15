@@ -1,4 +1,4 @@
-name: GoReleaser
+name: Release
 on:
  push:
    tags:
@@ -17,7 +17,7 @@ jobs:
       uses: actions/checkout@v1
     - name: Login to dockerhub
       env:
-        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_USERNAME: jderusse
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       run: |
         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin

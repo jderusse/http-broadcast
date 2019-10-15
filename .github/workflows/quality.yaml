@@ -1,0 +1,40 @@
+name: Quality
+on: "push"
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@master
+    - name: Lint Go Code
+      uses: docker://golangci/golangci-lint:latest
+      with:
+        args: golangci-lint run ./...
+
+  test:
+    name: Test with Coverage
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Go
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.13
+    - name: Check out code
+      uses: actions/checkout@master
+    - name: Install dependency
+      run: |
+        go mod download
+
+        GO111MODULE=off go get github.com/mattn/goveralls
+
+        cur=$PWD
+        cd $HOME/go/src/github.com/mattn/goveralls
+        git remote add fork https://github.com/jderusse/goveralls.git
+        git pull fork github
+        go build -o $cur/goveralls .
+    - name: Run Unit tests.
+      env:
+        COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+      run: |
+        ./goveralls -debug -race -covermode atomic --flags ./...
