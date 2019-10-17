@@ -147,7 +147,7 @@ func NewOptionsFromEnv() (*Options, error) {
 		},
 	}
 
-	missingEnv := []string{}
+	var missingEnv []string
 	if options.Hub.Endpoint == nil {
 		missingEnv = append(missingEnv, "HUB_ENDPOINT")
 	}

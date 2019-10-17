@@ -143,7 +143,7 @@ func (s *Server) startAcmeServer() {
 
 	ln, err := net.Listen("tcp", s.options.Server.TLS.AcmeAddr)
 	if err != nil {
-		log.Error(errors.Wrap(err, "fail to start acme server"))
+		log.Error(errors.Wrap(err, "start acme server"))
 	}
 
 	log.WithFields(log.Fields{"hosts": s.options.Server.TLS.AcmeHosts, "addr": s.options.Server.TLS.AcmeAddr}).Info("server: acme server listening")

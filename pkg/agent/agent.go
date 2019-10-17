@@ -94,7 +94,7 @@ func (a *Agent) listen() error {
 	}, backoff.WithContext(retry, ctx))
 
 	if err != nil {
-		return errors.Wrap(err, "fail to subscribe to stream")
+		return errors.Wrap(err, "subscribe to stream")
 	}
 
 	log.WithFields(log.Fields{"hub": a.hubURL()}).Info("agent: listening")

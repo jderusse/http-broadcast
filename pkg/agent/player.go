@@ -21,7 +21,7 @@ func (a *Agent) replay(requestID string, data []byte) {
 	var request dto.Request
 
 	if err := json.Unmarshal(data, &request); err != nil {
-		log.Error(errors.Wrap(err, "Failed to parse Request"))
+		log.Error(errors.Wrap(err, "parse Request"))
 		return
 	}
 
@@ -60,6 +60,6 @@ func (a *Agent) replay(requestID string, data []byte) {
 	})
 
 	if err != nil {
-		log.WithFields(log.Fields{"requestID": requestID}).Error(errors.Wrap(err, "unable to replay request"))
+		log.WithFields(log.Fields{"requestID": requestID}).Error(errors.Wrap(err, "replay request"))
 	}
 }

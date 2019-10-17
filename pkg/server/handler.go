@@ -25,7 +25,7 @@ func (s *Server) handle(w http.ResponseWriter, r *http.Request) {
 	// serializing original request
 	data, err := json.Marshal(request)
 	if err != nil {
-		log.Error(errors.Wrap(err, "Failed to encode Request"))
+		log.Error(errors.Wrap(err, "encode Request"))
 		w.WriteHeader(http.StatusInternalServerError)
 
 		return
@@ -52,7 +52,7 @@ func (s *Server) handle(w http.ResponseWriter, r *http.Request) {
 	// pushing request to hub
 	hubResponse, err := s.hubClient.Do(hubRequest)
 	if err != nil {
-		log.Error(errors.Wrap(err, "Server: Failed to push record"))
+		log.Error(errors.Wrap(err, "push record"))
 	}
 
 	if hubResponse.StatusCode >= 400 {
