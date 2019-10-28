@@ -1,17 +1,11 @@
 name: Quality
-on: "push"
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+    - master
 jobs:
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-    - name: Check out code
-      uses: actions/checkout@master
-    - name: Lint Go Code
-      uses: docker://golangci/golangci-lint:latest
-      with:
-        args: golangci-lint run ./...
-
   test:
     name: Test with Coverage
     runs-on: ubuntu-latest
