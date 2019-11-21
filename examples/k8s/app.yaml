@@ -94,7 +94,7 @@ spec:
         - name: AGENT_ENDPOINT
           value: http://127.0.0.1:6082
         - name: HUB_ENDPOINT
-          value: http://mercure/hub
+          value: http://mercure/.well-known/mercure
         - name: HUB_TOKEN
           value: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InN1YnNjcmliZSI6WyIqIl0sInB1Ymxpc2giOlsiKiJdfX0.M1yJUov4a6oLrigTqBZQO_ohWUsg3Uz1bnLD4MIyWLo"
         - name: LOG_LEVEL

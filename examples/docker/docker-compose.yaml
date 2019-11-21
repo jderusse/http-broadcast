@@ -6,7 +6,7 @@ services:
     environment:
       SERVER_ADDR: :6083
       AGENT_ENDPOINT: http://127.0.0.1:6082
-      HUB_ENDPOINT: http://mercure/hub
+      HUB_ENDPOINT: http://mercure/.well-known/mercure
       HUB_TOKEN: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InN1YnNjcmliZSI6WyIqIl0sInB1Ymxpc2giOlsiKiJdfX0.M1yJUov4a6oLrigTqBZQO_ohWUsg3Uz1bnLD4MIyWLo"
       LOG_LEVEL: info
       LOG_FORMAT: text
