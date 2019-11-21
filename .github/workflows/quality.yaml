@@ -5,6 +5,7 @@ on:
   push:
     branches:
     - master
+
 jobs:
   lint:
     name: Lint
@@ -26,13 +27,15 @@ jobs:
         go-version: 1.13
     - name: Check out code
       uses: actions/checkout@master
-    - name: Install dependency
+    - name: Install dependencies
       run: |
         go mod download
-
-        GO111MODULE=off go get github.com/mattn/goveralls
-    - name: Run Unit tests.
-      env:
-        COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+    - name: Run Unit tests
       run: |
-        $HOME/go/bin/goveralls -race -covermode atomic --flags ./...
+        go test -race -covermode atomic -coverprofile=profile.cov ./...
+    - name: Send coverage
+      env:
+        COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        GO111MODULE=off go get github.com/mattn/goveralls
+        $(go env GOPATH)/bin/goveralls -coverprofile=profile.cov -service=github
