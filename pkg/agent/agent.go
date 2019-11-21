@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/url"
 	"sync"
-	"time"
 
 	"github.com/cenkalti/backoff"
 	"github.com/donovanhide/eventsource"
@@ -74,7 +73,7 @@ func (a *Agent) listen() error {
 	}
 
 	retry := backoff.NewExponentialBackOff()
-	retry.MaxInterval = 5 * time.Second
+	retry.MaxInterval = defaultMaxInterval
 	retry.MaxElapsedTime = 0
 	ctx, cancel := context.WithCancel(context.Background())
 

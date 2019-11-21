@@ -35,7 +35,7 @@ func (a *Agent) replay(requestID string, data []byte) {
 	req.Host = request.Host
 
 	retry := backoff.NewExponentialBackOff()
-	retry.MaxInterval = 5 * time.Second
+	retry.MaxInterval = defaultMaxInterval
 	retry.MaxElapsedTime = a.options.Agent.RetryDelay
 	err := backoff.RetryNotify(func() error {
 		resp, err := http.DefaultClient.Do(req)
@@ -44,7 +44,7 @@ func (a *Agent) replay(requestID string, data []byte) {
 			reqStr, _ := httputil.DumpRequest(req, true)
 			respStr, _ := httputil.DumpResponse(resp, true)
 			log.WithFields(log.Fields{"requestID": requestID, "request": string(reqStr), "response": string(respStr)}).Debug("Agent: request played")
-			if resp.StatusCode >= 400 {
+			if resp.StatusCode >= http.StatusBadRequest {
 				err = errors.New(fmt.Sprintf(`Server respond with "%d" code.`, resp.StatusCode))
 			}
 		}
