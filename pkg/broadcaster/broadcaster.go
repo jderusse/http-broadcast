@@ -24,29 +24,33 @@ func (b *Broadcaster) Run() {
 	log.Debug("Broadcaster: starting")
 
 	if b.agent != nil {
-		b.wg.Add(1)
+		b.wg.Add(1) //nolint:gomnd
 
 		go func() {
 			if err := b.agent.ListenAndServe(); err != nil {
 				if err != agent.ErrServerClosed {
 					log.Error(err)
 				}
+
 				b.Stop()
 			}
+
 			b.wg.Done()
 		}()
 	}
 
 	if b.server != nil {
-		b.wg.Add(1)
+		b.wg.Add(1) //nolint:gomnd
 
 		go func() {
 			if err := b.server.ListenAndServe(); err != nil {
 				if err != server.ErrServerClosed {
 					log.Error(err)
 				}
+
 				b.Stop()
 			}
+
 			b.wg.Done()
 		}()
 	}
@@ -84,11 +88,10 @@ func (b *Broadcaster) handleShutdown() {
 	go func() {
 		sigint := make(chan os.Signal, 1)
 		signal.Notify(sigint, os.Interrupt)
-		for {
-			<-sigint
-			log.Infoln("My Baby Shot Me Down")
-			b.Stop()
-		}
+
+		<-sigint
+		log.Infoln("My Baby Shot Me Down")
+		b.Stop()
 	}()
 }
 

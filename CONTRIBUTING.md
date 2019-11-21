@@ -23,7 +23,7 @@ To run the test suite:
 
 To lint your code:
 
-    $ # go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
+    $ # GO111MODULE=off go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
     $ golangci-lint run --fix  ./...
 
 ## Pull Request Process
