@@ -6,7 +6,7 @@ Grab the binary corresponding to your operating system and architecture from
 the release page, then run:
 
 ```bash
-$ SERVER_ADDR=0.0.0.0:6801 AGENT_ENDPOINT=http://localhost:6800 HUB_TOKEN=<valid-jwt-token> HUB_ENDPOINT=https://example.com/hub http-broadcast
+$ SERVER_ADDR=0.0.0.0:6801 AGENT_ENDPOINT=http://localhost:6800 HUB_TOKEN=<valid-jwt-token> HUB_ENDPOINT=https://example.com/.well-known/mercure http-broadcast
 ```
 ## Docker Container
 
@@ -22,7 +22,7 @@ docker run --rm -ti \
     -e SERVER_ADDR=0.0.0.0:6801 \
     -e AGENT_ENDPOINT=http://varnish:6081 \
     -e HUB_TOKEN="<valid-jwt-token>" \
-    -e HUB_ENDPOINT=http://mercure-hub/hub \
+    -e HUB_ENDPOINT=http://mercure-hub/.well-known/mercure \
     -p 6801:6801
     jderusse/http-broadcast
 
