@@ -26,7 +26,10 @@ jobs:
       with:
         go-version: 1.13
     - name: Check out code
-      uses: actions/checkout@master
+      uses: actions/checkout@v2
+    - name: Fetch last commits
+      run: git fetch --depth=1 origin "$GITHUB_HEAD_REF"
+      if: github.event_name == 'pull_request'
     - name: Install dependencies
       run: |
         go mod download
@@ -34,8 +37,6 @@ jobs:
       run: |
         go test -race -covermode atomic -coverprofile=profile.cov ./...
     - name: Send coverage
-      env:
-        COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        GO111MODULE=off go get github.com/mattn/goveralls
-        $(go env GOPATH)/bin/goveralls -coverprofile=profile.cov -service=github
+      uses: shogo82148/actions-goveralls@v1
+      with:
+        path-to-profile: profile.cov
