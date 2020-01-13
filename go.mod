@@ -8,7 +8,7 @@ require (
 	github.com/gorilla/handlers v1.4.2
 	github.com/joho/godotenv v1.3.0
 	github.com/joonix/log v0.0.0-20190524090622-13fe31bbdd7a
-	github.com/pkg/errors v0.8.1
+	github.com/pkg/errors v0.9.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/stretchr/testify v1.4.0
 	github.com/unrolled/secure v1.0.7
