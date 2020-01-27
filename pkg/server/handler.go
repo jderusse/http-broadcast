@@ -55,7 +55,7 @@ func (s *Server) handle(w http.ResponseWriter, r *http.Request) {
 		log.Error(errors.Wrap(err, "push record"))
 	}
 
-	if hubResponse.StatusCode >= http.StatusBadRequest {
+	if hubResponse != nil && hubResponse.StatusCode >= http.StatusBadRequest {
 		defer hubResponse.Body.Close()
 		respStr, _ := httputil.DumpResponse(hubResponse, true)
 
