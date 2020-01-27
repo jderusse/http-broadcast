@@ -3,13 +3,12 @@ package agent
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"net/url"
 	"sync"
 
 	"github.com/cenkalti/backoff"
-	"github.com/donovanhide/eventsource"
 	"github.com/pkg/errors"
+	"github.com/r3labs/sse"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/jderusse/http-broadcast/pkg/config"
@@ -18,7 +17,8 @@ import (
 
 // Agent listen for request and dispatch it to a target
 type Agent struct {
-	stream  *eventsource.Stream
+	events chan *sse.Event
+
 	options *config.Options
 
 	inShutdown atomic.Bool
@@ -62,37 +62,25 @@ func (a *Agent) shuttingDown() bool {
 func (a *Agent) listen() error {
 	log.Debug("agent: starting")
 
-	hubRequest, err := http.NewRequest("GET", a.hubURL(), nil)
-
-	if err != nil {
-		return err
-	}
-
+	client := sse.NewClient(a.hubURL())
 	if a.options.Hub.SubscribeToken != "" {
-		hubRequest.Header.Set("Authorization", fmt.Sprintf("Bearer %s", a.options.Hub.SubscribeToken))
+		client.Headers["Authorization"] = fmt.Sprintf("Bearer %s", a.options.Hub.SubscribeToken)
 	}
 
-	retry := backoff.NewExponentialBackOff()
-	retry.MaxInterval = defaultMaxInterval
-	retry.MaxElapsedTime = 0
+	client.OnDisconnect(func(c *sse.Client) {
+		log.WithFields(log.Fields{"hub": a.hubURL()}).Warn("agent: disconnected")
+	})
+
 	ctx, cancel := context.WithCancel(context.Background())
 
 	a.RegisterOnShutdown(func() { cancel() })
 
-	err = backoff.Retry(func() error {
-		stream, err := eventsource.SubscribeWith("", http.DefaultClient, hubRequest)
-		if err == nil {
-			a.mu.Lock()
-			a.stream = stream
-			a.mu.Unlock()
+	retry := backoff.NewExponentialBackOff()
+	retry.MaxInterval = defaultMaxInterval
+	retry.MaxElapsedTime = 0
+	client.ReconnectStrategy = backoff.WithContext(retry, ctx)
 
-			return nil
-		}
-
-		return err
-	}, backoff.WithContext(retry, ctx))
-
-	if err != nil {
+	if err := client.SubscribeChanWithContext(ctx, "", a.events); err != nil {
 		return errors.Wrap(err, "subscribe to stream")
 	}
 
@@ -106,9 +94,9 @@ func (a *Agent) serve() error {
 		select {
 		case <-a.getDoneChan():
 			return ErrServerClosed
-		case event := <-a.stream.Events:
-			if event != nil {
-				go a.replay(event.Id(), []byte(event.Data()))
+		case event := <-a.events:
+			if event != nil && len(event.Data) > 0 {
+				go a.replay(string(event.ID), event.Data)
 			}
 		}
 	}
@@ -144,7 +132,6 @@ func (a *Agent) Shutdown() error {
 
 	a.inShutdown.Store(true)
 
-	lnerr := a.closeStreamLocked()
 	a.closeDoneChanLocked()
 
 	for _, f := range a.onShutdown {
@@ -153,7 +140,7 @@ func (a *Agent) Shutdown() error {
 
 	log.Debug("agent: stopped")
 
-	return lnerr
+	return nil
 }
 
 func (a *Agent) closeDoneChanLocked() {
@@ -183,17 +170,10 @@ func (a *Agent) getDoneChanLocked() chan struct{} {
 	return a.doneChan
 }
 
-func (a *Agent) closeStreamLocked() error {
-	if a.stream != nil {
-		a.stream.Close()
-	}
-
-	return nil
-}
-
 // NewAgent allocates and returns a new Agent.
 func NewAgent(options *config.Options) *Agent {
 	return &Agent{
+		events:  make(chan *sse.Event),
 		options: options,
 	}
 }
