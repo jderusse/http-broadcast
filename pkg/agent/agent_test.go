@@ -4,34 +4,51 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
 
-	"github.com/donovanhide/eventsource"
+	"github.com/r3labs/sse"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/jderusse/http-broadcast/pkg/config"
 )
 
+var u string
+var srv *sse.Server
+var server *httptest.Server
+
+func newServer() *sse.Server {
+	srv = sse.New()
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/events", srv.HTTPHandler)
+	server = httptest.NewServer(mux)
+
+	srv.CreateStream("foo")
+
+	return srv
+}
+
+func cleanup() {
+	server.CloseClientConnections()
+	server.Close()
+	srv.Close()
+}
+
 func TestNewAgent(t *testing.T) {
 	NewAgent(&config.Options{})
 }
 
 func TestServe(t *testing.T) {
-	server := eventsource.NewServer()
-	hubServer := httptest.NewServer(server.Handler("foo"))
+	newServer()
+	defer cleanup()
 
 	var targetRequest atomic.Value
 	targetServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		targetRequest.Store(r)
 	}))
-	// The server has to be closed before the hubServer is closed.
-	// Otherwise the hubServer has still an open connection and it can not close.
-	defer hubServer.Close()
-	defer server.Close()
 	defer targetServer.Close()
 
 	s := NewAgent(&config.Options{
@@ -39,7 +56,7 @@ func TestServe(t *testing.T) {
 			Endpoint: parseSafeURL(targetServer.URL),
 		},
 		Hub: config.HubOptions{
-			Endpoint: parseSafeURL(hubServer.URL),
+			Endpoint: parseSafeURL(server.URL + "/events?stream=foo"),
 		},
 	})
 
@@ -49,9 +66,7 @@ func TestServe(t *testing.T) {
 	go s.serve()
 	defer s.Shutdown()
 
-	event, err := eventsource.NewDecoder(strings.NewReader("id: 123\ndata: {}\n\n")).Decode()
-	require.Nil(t, err)
-	server.Publish([]string{"foo"}, event)
+	srv.Publish("foo", &sse.Event{ID: []byte("123"), Data: []byte("{}")})
 	time.Sleep(100 * time.Millisecond)
 
 	v, _ := targetRequest.Load().(*http.Request)
@@ -59,17 +74,13 @@ func TestServe(t *testing.T) {
 }
 
 func TestShutdown(t *testing.T) {
-	server := eventsource.NewServer()
-	hubServer := httptest.NewServer(server.Handler("foo"))
+	newServer()
+	defer cleanup()
 
 	var targetRequest atomic.Value
 	targetServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		targetRequest.Store(r)
 	}))
-	// The server has to be closed before the hubServer is closed.
-	// Otherwise the hubServer has still an open connection and it can not close.
-	defer hubServer.Close()
-	defer server.Close()
 	defer targetServer.Close()
 
 	s := NewAgent(&config.Options{
@@ -77,7 +88,7 @@ func TestShutdown(t *testing.T) {
 			Endpoint: parseSafeURL(targetServer.URL),
 		},
 		Hub: config.HubOptions{
-			Endpoint: parseSafeURL(hubServer.URL),
+			Endpoint: parseSafeURL(server.URL + "/events?stream=foo"),
 		},
 	})
 
@@ -87,9 +98,7 @@ func TestShutdown(t *testing.T) {
 	go s.serve()
 	s.Shutdown()
 
-	event, err := eventsource.NewDecoder(strings.NewReader("id: 123\ndata: {}\n\n")).Decode()
-	require.Nil(t, err)
-	server.Publish([]string{"foo"}, event)
+	srv.Publish("foo", &sse.Event{ID: []byte("123"), Data: []byte("{}")})
 	time.Sleep(100 * time.Millisecond)
 
 	v, _ := targetRequest.Load().(*http.Request)

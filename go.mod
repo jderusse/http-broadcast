@@ -4,11 +4,11 @@ go 1.13
 
 require (
 	github.com/cenkalti/backoff v2.2.1+incompatible
-	github.com/donovanhide/eventsource v0.0.0-20171031113327-3ed64d21fb0b
 	github.com/gorilla/handlers v1.4.2
 	github.com/joho/godotenv v1.3.0
 	github.com/joonix/log v0.0.0-20190524090622-13fe31bbdd7a
 	github.com/pkg/errors v0.9.1
+	github.com/r3labs/sse v0.0.0-20200123123541-10c56e11168e
 	github.com/sirupsen/logrus v1.4.2
 	github.com/stretchr/testify v1.4.0
 	github.com/unrolled/secure v1.0.7
