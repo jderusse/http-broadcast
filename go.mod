@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/cenkalti/backoff v2.2.1+incompatible
-	github.com/gorilla/handlers v1.4.2
+	github.com/gorilla/handlers v1.5.0
 	github.com/joho/godotenv v1.3.0
 	github.com/joonix/log v0.0.0-20190524090622-13fe31bbdd7a
 	github.com/pkg/errors v0.9.1
