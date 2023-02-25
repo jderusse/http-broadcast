@@ -12,5 +12,5 @@ require (
 	github.com/sirupsen/logrus v1.6.0
 	github.com/stretchr/testify v1.6.1
 	github.com/unrolled/secure v1.0.8
-	golang.org/x/crypto v0.0.0-20191119213627-4f8c1d86b1ba
+	golang.org/x/crypto v0.1.0
 )
